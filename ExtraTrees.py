@@ -67,7 +67,7 @@ def run_recognizer(clf):
 
     return accuracy, score, cm
 
-clf = ExtraTreesClassifier(n_estimators=500)
+    clf = ExtraTreesClassifier(n_estimators=500)
 
 
 for i in range(0, 3):
