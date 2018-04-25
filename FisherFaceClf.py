@@ -1,13 +1,18 @@
+'''
+Treino e Teste dos Classificadore da OpenCV
+'''
+
 import cv2
 import glob
 import random
 import numpy as np
 
-emotions = ["neutral", "anger", "contempt", "disgust", "fear", "happy", "sadness", "surprise"]
+emotions = ["neutral", "anger", "contempt", "disgust", "fear", "happy", "sadness", "surprise"] # emoções
 #emotions = ["happy", "surprise"]
+
 file = open('base1\\resultados.txt', 'w')
 
-
+# Um menu de escolha do classificadores
 def menu():
     print("Menu de escolha do Classificador: ")
     n = int(input("Digite uma opcao de classificador: "))
@@ -26,6 +31,7 @@ def menu():
 
     return classifier
 
+# Função que realiza o teste do classificador e ela armazena os arquivos com ambiguidades em difficult
 
 def predicao(prediction_data, prediction_labels):
     cnt = 0
@@ -44,14 +50,18 @@ def predicao(prediction_data, prediction_labels):
             cnt += 1
     return ((100 * correct) / (correct + incorrect))
 
+# Função para carregar as imagens de acordo com a emoção
 
 def get_files(emotion):
-    files = glob.glob("base1\dataset\\%s\\*" % emotion)
-    random.shuffle(files)
-    training = files[:int(len(files) * 0.8)]
-    prediction = files[-int(len(files) * 0.2):]
+    files = glob.glob("base1\dataset\\%s\\*" % emotion) # lista do caminho da imagens
+    random.shuffle(files) # Embaralha os dados
+    training = files[:int(len(files) * 0.8)] # 80% para treino
+    prediction = files[-int(len(files) * 0.2):] # 20% para teste
     return training, prediction
 
+# Função que armazena os dados de treino e teste fazendo a rotulação da imagem de acordo com a emoção
+# Ex: Se é neutra, então ele fará que a imagem na posição 0 da training_data é igual a 0(que siginifica nueutra) na posição 0
+# de training_labels. E o mesmo processo para o teste ou prediction.
 
 def make_sets():
     training_data = []
@@ -76,15 +86,12 @@ def make_sets():
 
     return training_data, training_labels, prediction_data, prediction_labels
 
+# Treina o classificador e chama a função de teste
 
 def run_recognizer():
     training_data, training_labels, prediction_data, prediction_labels = make_sets()
-
-    #print "\nClassificador de treinamento"
-    #print "O tamanho do conjunto de treinamento e: ", len(training_labels), "imagens"
+    
     classifier.train(training_data, np.asarray(training_labels))
-
-    #print "Previsao do conjunto de classificacao:"
 
     porcentagem = predicao(prediction_data, prediction_labels)
 
@@ -95,12 +102,12 @@ metascore = []
 
 classifier = menu()
 
+# Itera 10 vezes
 
 for i in range(0, 10):
     correct = run_recognizer()
     file.write("{} {}\n".format(i, correct))
     print("{}".format(i))
-    #print "Obteve", correct, "porcento correto!"
     metascore.append(correct)
 
 metascore = np.array(metascore)
